@@ -269,5 +269,3 @@ git push origin feature/my-feature
 MIT License — Free to use, modify and distribute.
 
 ---
-
-## 🧠 Built with ❤️ and clean architecture by Sachin Kumar and contributors.
