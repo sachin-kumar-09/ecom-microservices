@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_NAME = 'userservice'                             // The microservice/module name
+        JAR_NAME = 'userservice-0.0.1-SNAPSHOT.jar'              // Built JAR file name
+    }
+
+    tools {
+        jdk 'JDK17'                                              // Must match name from Jenkins Global Tool Config
+        maven 'Maven3'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // ✅ Step 1: Clone the latest code from dev branch
+                git branch: 'dev', url: 'https://github.com/sachin-kumar-09/ecom-microservices.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // ⚙️ Step 2: Navigate into the service directory and build the project
+                dir("${PROJECT_NAME}") {
+                    bat 'mvn clean install -DskipTests'          // Skips tests in build step
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                // 🧪 Step 3: Run tests separately to see test results
+                dir("${PROJECT_NAME}") {
+                    bat 'mvn test'
+                }
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                // 💾 Step 4: Save the built JAR for later use (deployment, verification)
+                archiveArtifacts artifacts: "${PROJECT_NAME}/target/${JAR_NAME}", fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Build & Test pipeline completed successfully for ${PROJECT_NAME}"
+        }
+        failure {
+            echo "❌ Build or Test failed for ${PROJECT_NAME}"
+        }
+    }
+}
