@@ -16,7 +16,7 @@
         <module>userservice</module>
         <module>configserver</module>
         <module>discoveryserver</module>
-<!--        <module></module>-->
+        <module>apigateway</module>
     </modules>
 
     <dependencyManagement>
