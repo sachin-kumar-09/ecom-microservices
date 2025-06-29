@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_NAME = 'discoveryserver'                            // Microservice name
-        JAR_NAME = 'discoveryserver-0.0.1-SNAPSHOT.jar'            // Output JAR
+        PROJECT_NAME = 'apigateway'                            // Microservice name
+        JAR_NAME = 'apigateway-0.0.1-SNAPSHOT.jar'            // Output JAR
     }
 
     tools {
