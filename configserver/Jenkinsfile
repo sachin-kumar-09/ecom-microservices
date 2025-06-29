@@ -40,27 +40,43 @@ pipeline {
         stage('Deploy') {
             steps {
                 dir("${PROJECT_NAME}") {
-                    // 🚀 Run the jar in background (Windows) using start
-                    bat "start java -jar target\\%JAR_NAME%"
+                    bat "start /B java -jar target\\%JAR_NAME%"
+                    echo "🚀 Application starting... waiting 10 seconds"
+                    sleep time: 10, unit: 'SECONDS'
                 }
             }
         }
 
         stage('Health Check') {
-			steps {
-				script {
-					def raw = bat(script: 'curl -s -o NUL -w "%%{http_code}" http://localhost:8888/actuator/health', returnStdout: true).trim()
-					def response = raw.readLines().last() // Extract only status code
+            steps {
+                script {
+                    def maxRetries = 10
+                    def waitSeconds = 5
+                    def healthy = false
 
-					if (response != '200') {
-						error "❌ Health check failed! Got response: ${response}"
-					} else {
-						echo "✅ Health check passed with response: ${response}"
-					}
-				}
-			}
-		}
-	}
+                    for (int i = 1; i <= maxRetries; i++) {
+                        echo "🔁 Attempt $i: Checking http://localhost:8888/actuator/health"
+                        def result = bat(script: 'curl -s -o NUL -w "%%{http_code}" http://localhost:8888/actuator/health', returnStdout: true).trim()
+
+                        if (result == '200') {
+                            echo "✅ Health check passed with response: ${result}"
+                            healthy = true
+                            break
+                        }
+
+                        echo "❌ Not healthy yet (response: ${result}) - retrying in ${waitSeconds}s..."
+                        sleep time: waitSeconds, unit: 'SECONDS'
+                    }
+
+                    if (!healthy) {
+                        error "❌ Application did not become healthy in time. Check logs or port conflict."
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
     post {

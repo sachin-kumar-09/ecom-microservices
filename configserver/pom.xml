@@ -10,6 +10,7 @@
 	<groupId>com.ecommerce</groupId>
 	<artifactId>configserver</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>ConfigServer</name>
 	<description>Centralized Configuration Server for managing all microservices configurations via Git repository or local files.</description>
 	<url/>
