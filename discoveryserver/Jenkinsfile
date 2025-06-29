@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_NAME = 'discoveryserver'
+
+    tools {
+        maven 'Maven3'
+        jdk 'JDK17'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/sachin-kumar-09/ecom-microservices.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir("discoveryserver") {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Run') {
+            steps {
+                dir("discoveryserver/target") {
+                    sh "nohup java -jar ${JAR_NAME} &"
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                script {
+                    sleep 10 // wait for app to boot
+
+                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:8761/actuator/health", returnStdout: true).trim()
+                    if (response != "200") {
+                        error("Health check failed! Status: ${response}")
+                    } else {
+                        echo "✅ Config Server is up and healthy!"
+                    }
+                }
+            }
+        }
+    }
+}

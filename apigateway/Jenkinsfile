@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_NAME = 'discoveryserver'                            // Microservice name
+        JAR_NAME = 'discoveryserver-0.0.1-SNAPSHOT.jar'            // Output JAR
+    }
+
+    tools {
+        maven 'Maven3'                                           // Tool names must match Jenkins Global Tools
+        jdk 'JDK17'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // ✅ Clone the 'dev' branch from your GitHub repository
+                git branch: 'dev', url: 'https://github.com/sachin-kumar-09/ecom-microservices.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir("${PROJECT_NAME}") {
+                    // ⚙️ Clean and build without running tests
+                    bat 'mvn clean install -DskipTests'
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                dir("${PROJECT_NAME}") {
+                    // 🧪 Run JUnit tests
+                    bat 'mvn test'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                dir("${PROJECT_NAME}") {
+                    // 🚀 Run the jar in background (Windows) using start
+                    bat "start java -jar target\\%JAR_NAME%"
+                }
+            }
+        }
+
+        stage('Health Check') {
+			steps {
+				script {
+					def raw = bat(script: 'curl -s -o NUL -w "%%{http_code}" http://localhost:8888/actuator/health', returnStdout: true).trim()
+					def response = raw.readLines().last() // Extract only status code
+
+					if (response != '200') {
+						error "❌ Health check failed! Got response: ${response}"
+					} else {
+						echo "✅ Health check passed with response: ${response}"
+					}
+				}
+			}
+		}
+	}
+
+
+    post {
+        success {
+            echo "🎉 Build, Deploy & Health Check completed successfully for ${PROJECT_NAME}"
+        }
+        failure {
+            echo "❌ Build, Test, or Health Check failed for ${PROJECT_NAME}"
+        }
+    }
+}
+
