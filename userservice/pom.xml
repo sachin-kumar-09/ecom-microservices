@@ -10,6 +10,7 @@
 	<groupId>com.ecom</groupId>
 	<artifactId>userservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>UserService</name>
 	<description>Handles user CRUD operations (registration, profile updates, retrieval). Consumes AuthService for authentication.</description>
 	<url/>

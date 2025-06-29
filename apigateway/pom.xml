@@ -10,6 +10,7 @@
 	<groupId>com.ecom</groupId>
 	<artifactId>apigateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>ApiGateway</name>
 	<description>API Gateway for routing external/internal requests to microservices. Responsible for token validation using JWT/OAuth2 Resource Server capabilities.</description>
 

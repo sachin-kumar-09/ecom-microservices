@@ -10,6 +10,7 @@
 	<groupId>com.ecom</groupId>
 	<artifactId>discoveryserver</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>DiscoveryServer</name>
 	<description>Eureka Discovery Server that registers all microservices for service discovery and load balancing.</description>
 
